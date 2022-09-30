@@ -6,11 +6,28 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include<string.h>
+//#include "test/strtok.c"
 
 // Rôle du serveur : accepter la demande de connexion d'un client,
 // recevoir une chaîne de caractères, afficher cette chaîne et
 // renvoyer au client le nombre d'octets reçus par le serveur.
-
+void sep(char* debut,char* fin,char* tab, int size, char c){
+ int i = 0;
+ printf("%i\n",size);
+ while(tab[i]!=c){
+   debut[i] = tab[i];
+   i++;
+ }
+ 
+ i++;
+ int j = 0;
+ while(i < size) {
+   fin[j] = tab[i];
+   printf("%c\n",tab[i] );
+   j++;
+   i++;
+ }
+}
 int main(int argc, char *argv[])
 {
   // paramètre = num port socket d'écoute
@@ -74,8 +91,8 @@ int main(int argc, char *argv[])
      communiquer avec lui.*/
 
   //tableau des sockets clients ici
-  struct in_addr addrClients[5];
-  unsigned short portsClients[5];
+  char addrClients[nbClients][20];
+  char portsClients[10];
   int cptClient = 0;
 
   while(cptClient < nbClients){
@@ -83,12 +100,12 @@ int main(int argc, char *argv[])
 	  printf("Serveur : j'attends la demande d'un client (accept) \n");
 
 	  
-	  struct sockaddr_in adCv ; // obtenir adresse client accepté
-	  socklen_t lgCv = sizeof (struct sockaddr_in);
+	  struct sockaddr_in adC ; // obtenir adresse client accepté
+	  socklen_t lgC = sizeof (struct sockaddr_in);
 
 	  printf("Serveur : debug1\n");
 
-	  int dsCv = accept(ds,(struct sockaddr *) &adCv, &lgCv);
+	  int dsCv = accept(ds,(struct sockaddr *) &adC, &lgC);
 	  if (dsCv < 0){
 	    perror ( "Serveur, probleme accept :");
 	    close(ds);
@@ -97,27 +114,23 @@ int main(int argc, char *argv[])
 	  printf("Serveur : debug2\n");
 	  
 	  /* affichage adresse socket client accepté :
-	     adresse IP et numéro de port de structure adCv. 
+	     adresse IP et numéro de port de structure adC. 
 	     Attention conversions format réseau -> format hôte.
 	     fonction inet_ntoa(..) pour l'IP. */
 
-	  char* ipserv = inet_ntoa(adCv.sin_addr);
+	  char* ipserv = inet_ntoa(adC.sin_addr);
 	  int port = htons(server.sin_port);
 	  printf("Serveur: le client %s:%d est connecté  \n", ipserv, port);
 
-	  //on a un client on stocke donc son adresse dans notre tableau addrClients
-	  //ATTENTION adresse sera dans addrClients[cptClient] au format réseau
-
-	  addrClients[cptClient] = adCv.sin_addr;
-	  //portsClients[cptClient] = adCv.sin_port;
-
 	  
+	  //portsClients[cptClient] = adC.sin_port;
+
 
 	  //Maintenant le client doit envoyer le numéro de port sur lequel il sera accéssible pour son voisin
 
 	  /* réception message */
 	 
-	  unsigned short buffer[10*sizeof(unsigned short)];
+	  char buffer[100];
 
 	  /* attendre message taille max = 10 shorts. */
 	  //char stop=fgetc(stdin);
@@ -137,38 +150,24 @@ int main(int argc, char *argv[])
 	    close(ds);
 	    exit (1);
 	  }
-
-	  /*buffer[strlen(buffer)+1]='\0';*/
-	  /* Afficher nb octets EFFECTIVEMENT reçus
-	                /!\
-	    nb octets buffer réception socket != nb octets extraits */
 	  
 	  printf("Serveur : j'ai recu %d octets \n", rcv);
-	  printf("Serveur : contenu du message : %i \n", buffer[0]);
+	  printf("Serveur : contenu du message : %s \n", buffer);
 
-	  //on stocke le num de port
-	  portsClients[cptClient] = buffer[0];
+
+	  //on a un client on stocke donc son adresse dans notre tableau addrClients
+	  //ATTENTION adresse sera dans addrClients[cptClient] au format réseau
+
+	 sep(addrClients[cptClient],portsClients,buffer, rcv, ':');
+
+
+
+	  printf("Serveur : addrClients[0] = %s  \n", addrClients[cptClient]);
+	  printf("Serveur : portsClients[0] = %s \n", portsClients);
 
 	  //incrémentation nb clients enregistrés
 	  cptClient++;
 
-	  /* Reponse client = nb octets effectivement reçus */ 
-
-	  // int snd = send(dsCv,&rcv,sizeof(rcv),0);
-	  
-	  // if (snd < 0){ 
-	  //   perror ( "Serveur, probleme envoi :");
-	  //   close(dsCv);
-	  //   close(ds);
-	  //   exit (1);
-	  // }
-	  // else if (snd == 0)
-	  // {
-	  //   printf("Serveur : socket fermée ?!?\n");
-	  //   close(dsCv);
-	  //   close(ds);
-	  //   exit (1);
-	  // }
 	    
 	  // /*fermeture socket client */ 
 

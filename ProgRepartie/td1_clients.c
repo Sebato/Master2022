@@ -4,24 +4,11 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <stdlib.h>
-#include<arpa/inet.h>
-#include<string.h>
+#include <arpa/inet.h>
+#include <string.h>
+#include "test/strtok.c"
 
 
-void sep(char* debut,char* fin,char* tab, int size, char c){
- int i = 0;
- while(tab[i]!=c){
-   debut[i] = tab[i];
-   i++;
- }
- 
- i++;
- 
- while(i < size) {
-   fin[i] = tab[i];
-   i++;
- }
-}
 
 int main(int argc, char *argv[]) {
 
@@ -91,7 +78,7 @@ int main(int argc, char *argv[]) {
 
 
   int conn = connect(socketServ,(struct sockaddr*) &adrServ,lgAdr);
-  printf("client : conn : %d \n", conn);
+  //printf("client : conn : %d \n", conn);
  
   if (conn <0){
     perror ("Client: pb de connect :");
@@ -103,13 +90,30 @@ int main(int argc, char *argv[]) {
   
   /* saisie port socket voisin. */
 
-  unsigned short port_perso[1] = {atoi(argv[3])};
+  int taille = (int) sizeof(inet_ntoa(clientVoisin.sin_addr))+1+sizeof(argv[3]);
+
+  char big [taille];
+  memset(big, 0, taille);
+
+printf(" big : %s\n",big);
+
+  strcat(big,inet_ntoa(clientVoisin.sin_addr));
+  strcat(big,":"); 
+  strcat(big, argv[3]);
+
+  printf("sizeof big : %li\n",sizeof(big) );
+
+  // unsigned short port_perso[1] = {atoi(argv[3])};
+  
+  // char * adresse_perso[sizeof(unsigned long)];
+
+  // adresse_perso[0] = inet_ntoa(clientVoisin.sin_addr);
  
-  printf("port à utiliser pour communiquer avec voisin : %i \n", port_perso[0]);
+  printf("\n\n adresse et port à utiliser pour communiquer avec voisin : %s \n", big);
  
 
     /*envoi message port*/
-  int snd = send(socketServ,port_perso,sizeof(port_perso),0);
+  int snd = send(socketServ,big,sizeof(big),0);
 
 if (snd < 0){
     perror("client : probleme envoi\n");
@@ -125,9 +129,25 @@ if (snd < 0){
 
   printf("Client : j'ai déposé %d octets (message)\n", snd);
 
+  // int snd2 = send(socketServ,port_perso,sizeof(port_perso),0);
+  // if (snd2 < 0){
+  //   perror("client : probleme envoi\n");
+  //   close (socketServ);
+  //   exit (1);
+  // }
+  // else if (snd2 == 0)
+  // {
+  //   perror("client : socket fermée ?!?\n");
+  //   close (socketServ);
+  //   exit (1);
+  // }
+
+  // printf("Client : j'ai déposé %d octets (message)\n", snd2);
+
+
   //reception ip:port à contacter
 
-  char buffer[sizeof(char)+sizeof(clientVoisin.sin_addr.s_addr)+sizeof(clientVoisin.sin_port)];
+  char buffer[sizeof(char)+sizeof(unsigned long)+sizeof(unsigned short)];
 
   int rcv = recv(socketServ, buffer, sizeof(buffer),0) ;
 
@@ -185,6 +205,18 @@ if (snd < 0){
     exit (1);
   } 
  
+
+
+ ////
+
+
+  
+// recevoir infos server
+
+
+
+
+  ////
   printf("client: J'attends mon voisin de gauche : ok\n");
 
   //CONNEXION SOCKET VOISIN (ENVOI)
