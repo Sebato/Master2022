@@ -8,6 +8,21 @@
 #include<string.h>
 
 
+void sep(char* debut,char* fin,char* tab, int size, char c){
+ int i = 0;
+ while(tab[i]!=c){
+   debut[i] = tab[i];
+   i++;
+ }
+ 
+ i++;
+ 
+ while(i < size) {
+   fin[i] = tab[i];
+   i++;
+ }
+}
+
 int main(int argc, char *argv[]) {
 
   /* parametres : IP, numéro port serveur, numéro port perso)*/
@@ -20,9 +35,9 @@ int main(int argc, char *argv[]) {
   /* Creation socket Pour Server*/
 
 
-  int ds = socket(AF_INET, SOCK_STREAM,0);
+  int socketServ = socket(AF_INET, SOCK_STREAM,0);
 
-  if (ds == -1){
+  if (socketServ == -1){
     printf("Client : pb creation socket\n");
     exit(1);
   }
@@ -41,9 +56,9 @@ int main(int argc, char *argv[]) {
 
   /* creation socket permet recevoir demandes connexion.*/
 
-  int dsVoisin = socket(PF_INET, SOCK_STREAM, 0);
+  int socketVoisin = socket(PF_INET, SOCK_STREAM, 0);
 
-  if (dsVoisin == -1){
+  if (socketVoisin == -1){
     perror("client : probleme creation socketVoisin");
     exit(1);
   }
@@ -62,21 +77,25 @@ int main(int argc, char *argv[]) {
   clientVoisin.sin_addr.s_addr = INADDR_ANY;
   clientVoisin.sin_port = htons(atoi(argv[3]));
   
-  if(bind(ds,(struct sockaddr*) &clientVoisin, sizeof(clientVoisin)) < 0){
+  if(bind(socketVoisin,(struct sockaddr*) &clientVoisin, sizeof(clientVoisin)) < 0){
     perror("client : erreur bind");
-    close(ds);
+    close(socketVoisin);
     exit(1);
   }
 
   printf("client : nommage : ok\n");
 
   /* demande de connexion au serveur.*/
+  printf("client : adresse server : %s \n", inet_ntoa(adrServ.sin_addr));
+  printf("client : PORT server : %d \n", ntohs(adrServ.sin_port));
 
-  int conn = connect(ds,(struct sockaddr*) &adrServ,lgAdr);
+
+  int conn = connect(socketServ,(struct sockaddr*) &adrServ,lgAdr);
+  printf("client : conn : %d \n", conn);
  
   if (conn <0){
     perror ("Client: pb de connect :");
-    close (ds);
+    close (socketServ);
     exit (1);
   }
   printf("Client : demande de connexion reussie \n");
@@ -90,50 +109,122 @@ int main(int argc, char *argv[]) {
  
 
     /*envoi message port*/
-  int snd = send(ds,port_perso,sizeof(port_perso),0);
+  int snd = send(socketServ,port_perso,sizeof(port_perso),0);
 
 if (snd < 0){
     perror("client : probleme envoi\n");
-    close (ds);
+    close (socketServ);
     exit (1);
   }
   else if (snd == 0)
   {
     perror("client : socket fermée ?!?\n");
-    close (ds);
+    close (socketServ);
     exit (1);
   }
 
   printf("Client : j'ai déposé %d octets (message)\n", snd);
 
+  //reception ip:port à contacter
+
+  char buffer[sizeof(char)+sizeof(clientVoisin.sin_addr.s_addr)+sizeof(clientVoisin.sin_port)];
+
+  int rcv = recv(socketServ, buffer, sizeof(buffer),0) ;
+
+	if (socketServ < 0){ 
+		perror ( "client : probleme reception :");
+		close(socketServ);
+		close(socketVoisin);
+		exit (1);
+	}
+	else if (socketServ == 0)
+	{
+		printf("client : socket serveur fermée ?!?\n");
+		close(socketServ);
+		close(socketVoisin);
+		exit (1);
+	}
+
+	printf("Serveur : j'ai recu %d octets \n", rcv);
+	printf("Serveur : contenu du message : %i \n", buffer[0]);
 
 
-  // /* reception réponse serveur = nb octets message reçu */
 
-  // printf("Client : envois faits, j'attends la reponse du serveur \n");
+
+	//socket demande connexion 
+	int dsEnvoi = socket(AF_INET, SOCK_STREAM,0);
+
+	if (dsEnvoi == -1){
+		printf("Client : pb creation socket Envoi\n");
+		exit(1);
+	}
+		printf("Client: creation de la socket Envoi : ok\n");
   
-  // int reponse;
-  // int rcv = recv (ds, &reponse, sizeof(reponse),0) ;
-  
-  // if (rcv < 0){
-  //   perror("Client : probleme reception\n");
-  //   close (ds);
-  //   exit (1);
-  // }
-  // else if (rcv == 0)
-  // {
-  //   printf("Client : socket fermée ?!?\n");
-  //   close (ds);
-  //   exit (1);
-  // }
+  /* contiendra adresse ip socket Envoi */
+		char ipEnvoi[sizeof(unsigned long)];
 
-  // /* compare nboctets déposés & val reçue
-  //    objectif avoir même valeur. */
+  /* contiendra port socket Envoi */
+		char portEnvoi[sizeof(short unsigned int)];
 
-  // printf("Client : j'ai envoyé %d octets et le serveur me répond qu'il a reçu : %d octets \n", snd+snd2, reponse) ;
+		sep(ipEnvoi, portEnvoi, buffer, sizeof(buffer), ':');
 
-  // /* Fin */
 
-  close (ds);
-  printf("Client : je termine\n");
+  //CRÉATION SOCKET ENVOI
+  struct sockaddr_in adrEnvoi;
+    adrEnvoi.sin_family = AF_INET;
+    inet_pton(AF_INET, ipEnvoi, &(adrEnvoi.sin_addr));
+    adrEnvoi.sin_port = atoi(portEnvoi);
+      
+  int lgAdr2 = sizeof(struct sockaddr_in);
+
+  //MISE EN ECOUTE POUR ENTRÉE
+  int ecoute = listen(socketVoisin,1);
+  if (ecoute < 0){
+    printf("client : je suis sourd(e)\n");
+    close (socketVoisin);
+    exit (1);
+  } 
+ 
+  printf("client: J'attends mon voisin de gauche : ok\n");
+
+  //CONNEXION SOCKET VOISIN (ENVOI)
+  conn = connect(dsEnvoi,(struct sockaddr*) &adrEnvoi,lgAdr2);
+ 
+  if (conn <0){
+    perror ("Client: pb de connect :");
+    close (dsEnvoi);
+    exit (1);
+  }
+  printf("\n\nClient : demande de connexion au voisin reussie ?\n");
+
+
+  while(1){
+  	printf("client : j'attends la demande du voisin (accept) \n");
+
+	struct sockaddr_in adCv ; // obtenir adresse client accepté
+	socklen_t lgCv = sizeof (struct sockaddr_in);
+
+	int voisacc = accept(socketVoisin,(struct sockaddr *) &adCv, &lgCv);
+	if (voisacc < 0){
+		perror ( "client, probleme accept :");
+		close(socketVoisin);
+		exit (1);
+	}
+
+	/* affichage adresse socket client accepté :
+	 adresse IP et numéro de port de structure adCv. 
+	 Attention conversions format réseau -> format hôte.
+	 fonction inet_ntoa(..) pour l'IP. */
+
+	// char* ipserv = inet_ntoa(adCv.sin_addr);
+	// int port = htons(server.sin_port);
+	printf("client: le voisin est connecté  \n");
+
+
+	  //fermeture socket server à la fin
+	}
+	close (socketServ);
+	close (socketVoisin);
+	printf("Client : je termine\n");
 }
+

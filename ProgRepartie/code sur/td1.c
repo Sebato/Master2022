@@ -43,15 +43,13 @@ int main(int argc, char *argv[])
   struct sockaddr_in server;
   server.sin_family = AF_INET;
   server.sin_addr.s_addr = INADDR_ANY;
-  server.sin_port =  htons(atoi(argv[1]));
+  server.sin_port = htons(atoi(argv[1]));
   
   if(bind(ds,(struct sockaddr*) &server, sizeof(server)) < 0){
     perror("Serveur : erreur bind");
     close(ds);
     exit(1);
   }
-
-  printf("Serveur: adresse = %s:%d est connecté  \n", inet_ntoa(server.sin_addr), server.sin_port);
 
   printf("Serveur: nommage : ok\n");
 
@@ -86,15 +84,12 @@ int main(int argc, char *argv[])
 	  struct sockaddr_in adCv ; // obtenir adresse client accepté
 	  socklen_t lgCv = sizeof (struct sockaddr_in);
 
-	  printf("Serveur : debug1\n");
-
 	  int dsCv = accept(ds,(struct sockaddr *) &adCv, &lgCv);
 	  if (dsCv < 0){
 	    perror ( "Serveur, probleme accept :");
 	    close(ds);
 	    exit (1);
 	  }
-	  printf("Serveur : debug2\n");
 	  
 	  /* affichage adresse socket client accepté :
 	     adresse IP et numéro de port de structure adCv. 
@@ -109,7 +104,6 @@ int main(int argc, char *argv[])
 	  //ATTENTION adresse sera dans addrClients[cptClient] au format réseau
 
 	  addrClients[cptClient] = adCv.sin_addr;
-	  //portsClients[cptClient] = adCv.sin_port;
 
 	  
 
