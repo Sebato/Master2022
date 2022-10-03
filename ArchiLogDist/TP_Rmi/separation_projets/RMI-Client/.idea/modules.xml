@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/RMI-Client.iml" filepath="$PROJECT_DIR$/RMI-Client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../RMI-Commons/RMI-Commons.iml" filepath="$PROJECT_DIR$/../RMI-Commons/RMI-Commons.iml" />
+    </modules>
+  </component>
+</project>
