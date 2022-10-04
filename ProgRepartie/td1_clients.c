@@ -6,9 +6,26 @@
 #include <stdlib.h>
 #include <arpa/inet.h>
 #include <string.h>
-#include "test/strtok.c"
+#include <fcntl.h>
+#include <errno.h>
 
-
+void sep(char* debut,char* fin,char* tab, int size, char c){
+ int i = 0;
+ //printf("%i\n",size);
+ while(tab[i]!=c){
+   debut[i] = tab[i];
+   i++;
+ }
+ 
+ i++;
+ int j = 0;
+ while(i < size) {
+   fin[j] = tab[i];
+   //printf("%c\n",tab[i] );
+   j++;
+   i++;
+ }
+}
 
 int main(int argc, char *argv[]) {
 
@@ -147,9 +164,10 @@ if (snd < 0){
 
   //reception ip:port à contacter
 
-  char buffer[sizeof(char)+sizeof(unsigned long)+sizeof(unsigned short)];
+  char buffer[100];
 
-  int rcv = recv(socketServ, buffer, sizeof(buffer),0) ;
+  int rcv = recv(socketServ, buffer, sizeof(buffer),0);
+  printf("hello coucou recv%d\n",rcv );
 
 	if (socketServ < 0){ 
 		perror ( "client : probleme reception :");
@@ -166,7 +184,7 @@ if (snd < 0){
 	}
 
 	printf("Serveur : j'ai recu %d octets \n", rcv);
-	printf("Serveur : contenu du message : %i \n", buffer[0]);
+	printf("Serveur : contenu du message : %s \n", buffer);
 
 
 
@@ -181,12 +199,14 @@ if (snd < 0){
 		printf("Client: creation de la socket Envoi : ok\n");
   
   /* contiendra adresse ip socket Envoi */
-		char ipEnvoi[sizeof(unsigned long)];
+		char ipEnvoi[20];
 
   /* contiendra port socket Envoi */
-		char portEnvoi[sizeof(short unsigned int)];
+		char portEnvoi[10];
 
-		sep(ipEnvoi, portEnvoi, buffer, sizeof(buffer), ':');
+		sep(ipEnvoi, portEnvoi, buffer, rcv, ':');
+
+		printf("\n\n adresse %s:%s\n",ipEnvoi,portEnvoi );
 
 
   //CRÉATION SOCKET ENVOI
@@ -198,6 +218,9 @@ if (snd < 0){
   int lgAdr2 = sizeof(struct sockaddr_in);
 
   //MISE EN ECOUTE POUR ENTRÉE
+  int flags = fcntl(socketVoisin, F_GETFL);
+  fcntl(socketVoisin, F_SETFL, flags | O_NONBLOCK);
+
   int ecoute = listen(socketVoisin,1);
   if (ecoute < 0){
     printf("client : je suis sourd(e)\n");
@@ -209,39 +232,45 @@ if (snd < 0){
 
  ////
 
-
-  
 // recevoir infos server
-
-
-
 
   ////
   printf("client: J'attends mon voisin de gauche : ok\n");
 
   //CONNEXION SOCKET VOISIN (ENVOI)
-  conn = connect(dsEnvoi,(struct sockaddr*) &adrEnvoi,lgAdr2);
- 
-  if (conn <0){
-    perror ("Client: pb de connect :");
-    close (dsEnvoi);
-    exit (1);
-  }
-  printf("\n\nClient : demande de connexion au voisin reussie ?\n");
-
-
-  while(1){
-  	printf("client : j'attends la demande du voisin (accept) \n");
-
 	struct sockaddr_in adCv ; // obtenir adresse client accepté
 	socklen_t lgCv = sizeof (struct sockaddr_in);
 
-	int voisacc = accept(socketVoisin,(struct sockaddr *) &adCv, &lgCv);
-	if (voisacc < 0){
-		perror ( "client, probleme accept :");
-		close(socketVoisin);
-		exit (1);
-	}
+  while(accept(socketVoisin,(struct sockaddr *) &adCv, &lgCv)==-1)
+  {printf("ERRNO = %d\n",errno);
+    conn = 25000;
+  	conn = connect(dsEnvoi,(struct sockaddr*) &adrEnvoi,lgAdr2);
+	  if (conn <0){
+	    perror ("Client: pb de connect : ");
+	    printf("conn = %d\n", conn);
+	  }else printf("\n\nClient : demande de connexion au voisin reussie ?\n");
+  	
+  	if (errno == EWOULDBLOCK) {
+        printf("No pending connections; sleeping for one second.\n");
+        sleep(2);
+      } else {
+        perror("error when accepting connection");
+        exit(1);
+      }
+  }
+ 
+
+
+
+  	printf("client : sortie de boucle connection acceptée \n");
+
+
+	// int voisacc = accept(socketVoisin,(struct sockaddr *) &adCv, &lgCv);
+	// if (voisacc < 0){
+	// 	perror ( "client, probleme accept :");
+	// 	close(socketVoisin);
+	// 	exit (1);
+	// }
 
 	/* affichage adresse socket client accepté :
 	 adresse IP et numéro de port de structure adCv. 
@@ -254,7 +283,7 @@ if (snd < 0){
 
 
 	  //fermeture socket server à la fin
-	}
+	
 	close (socketServ);
 	close (socketVoisin);
 	printf("Client : je termine\n");
