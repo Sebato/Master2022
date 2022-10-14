@@ -12,9 +12,9 @@ public class Server {
     /* METHODS */
     public static void main(String[] args) throws MalformedURLException, ClassNotFoundException {
 
-        System.setProperty("java.rmi.server.codebase", "file:/home/e20170009949/IdeaProjects/TPRMi1/out/production/TPRMi1/Commons/");
-        System.setProperty( "java.rmi.server.codebase", "file:/home/e20170009949/IdeaProjects/RMI-Commons/out/production/RMI-Client/" );
         System.setProperty( "java.security.policy","/home/e20170009949/IdeaProjects/TPRMi1/src/server/animal.policy");
+        System.setProperty("java.rmi.server.codebase", "file:/home/e20170009949/IdeaProjects/RMI-Client/out/production/RMI-Client/");
+        /*System.setProperty( "java.rmi.server.codebase", "file:/home/e20170009949/IdeaProjects/RMI-Commons/out/production/RMI-Client/" );*/
         //SecurityManager security = new SecurityManager();
 
         System.setSecurityManager(new SecurityManager());

@@ -27,16 +27,19 @@ public class Client {
                 Dossier_Suivi info = new Dossier_Suivi(toto.getNom() + " est en bonne santé");
 
                 toto.setDossier(info);
-                toto.printDossier();
+                //toto.printDossier();
 
-                System.out.println(toto.getDossier_suivi().getDossier());
-                System.out.println(obj.searchAnimal("toto").getDossier_suivi().getDossier());
+                //System.out.println(toto.getDossier_suivi().getDossier());
+                //System.out.println(obj.searchAnimal("toto").getDossier_suivi().getDossier());
             }else System.out.println("toto introuvable");
 
 
-            /*Espece chien = new Espece("Chien", 15);*/
-            Poulpe P = new Poulpe();
-            obj.ajoutPatient("Momo", "Jojo", P, "huit tentacules");
+            Espece chien = new Espece("Chien", 15);
+            Poulpe p = new Poulpe();
+            obj.ajoutPatient("zizou", "Jojo", chien, "chihuahua");
+            //obj.searchAnimal("zizou").printAnimal();
+
+            obj.ajoutPatient("Momo", "Jojo", p, "huit tentacules");
             obj.searchAnimal("Momo").printAnimal();
             /*(Poulpe) obj.searchAnimal("Momo").getEspece().;*/
 

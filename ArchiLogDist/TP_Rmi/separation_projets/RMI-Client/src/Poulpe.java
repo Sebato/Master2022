@@ -1,6 +1,6 @@
 import java.io.Serializable;
 
-public class Poulpe extends Espece implements Serializable {
+public class Poulpe extends Espece implements Serializable{
     public Poulpe() {
         super("Poulpe", 2);
     }
