@@ -383,7 +383,6 @@ class UPPLoad extends UPPExpr {
         PRegister regE = addr.getPRegister(locals);
         RTLInst load = new RTLLoad(regE, reg,succ);
         return addr.toRTL(locals, globals, regE, load);
-//      return new RTLLoad(addr.getPRegister(locals), reg, succ);
     }//toRTL
 
 }//UPPLoad
@@ -471,8 +470,9 @@ class UPPCond extends UPPInst {
         RTLInst ni1 = i1.toRTL(locals,globals,succ);
         RTLInst ni2 = i2.toRTL(locals,globals,succ);
         RTLGtz gtz = new RTLGtz(regCond,ni1,ni2);
+        RTLInst icond = cond.toRTL(locals,globals,regCond,gtz);
 
-        return gtz;
+        return icond;
     }//toRTL
 
 }//UPPCond
@@ -543,7 +543,6 @@ class UPPSeq extends UPPInst {
 
     RTLInst toRTL (ArrayList<Pair<String,PRegister>> locals,
                    ArrayList<String> globals, RTLInst succ) {
-
 
         RTLInst ni2 = i2.toRTL(locals,globals,succ);
         RTLInst ni1 = i1.toRTL(locals,globals,ni2);
@@ -619,7 +618,7 @@ class UPPProc extends UPPDef {
         ArrayList<PRegister> regArgs = new ArrayList<PRegister>();
         ArrayList<PRegister> regLocals = new ArrayList<PRegister>();
         ArrayList<Pair<String,PRegister>> regTrans =
-                new ArrayList<Pair<String,PRegister>>();
+               new ArrayList<Pair<String,PRegister>>();
         //PRegister regRet = null;
         for (String e : args) {
             PRegister reg = new PRegister ();
