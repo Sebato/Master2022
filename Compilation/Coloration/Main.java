@@ -4,53 +4,53 @@ public class Main {
 
 
 
-    /*public static void main(String[] args) {
+    public static void main(String[] args) {
 
         //creation du graphe
         Graphe g = new Graphe();
 
         //creation des sommets
-        Sommet s1 = new Sommet(0);
-        Sommet s2 = new Sommet(1);
-        Sommet s3 = new Sommet(2);
-        Sommet s4 = new Sommet(3);
-        Sommet s5 = new Sommet(4);
-        Sommet s6 = new Sommet(5);
+        Sommet s0 = new Sommet(0);
+        Sommet s1 = new Sommet(1);
+        Sommet s2 = new Sommet(2);
+        Sommet s3 = new Sommet(3);
+        Sommet s4 = new Sommet(4);
+        Sommet s5 = new Sommet(5);
 
         //ajout des sommets au graphe
+        g.ajouterSommet(s0);
         g.ajouterSommet(s1);
         g.ajouterSommet(s2);
         g.ajouterSommet(s3);
         g.ajouterSommet(s4);
         g.ajouterSommet(s5);
-        g.ajouterSommet(s6);
 
         //ajout des voisins
-        s1.ajouterVoisin(s2);
-        s1.ajouterVoisin(s5);
-        s1.ajouterVoisin(s6);
+        s0.ajouterVoisin(s1);
+        s0.ajouterVoisin(s4);
+        s0.ajouterVoisin(s5);
 
-        s2.ajouterVoisin(s1);
-        s2.ajouterVoisin(s4);
+        s1.ajouterVoisin(s0);
+        s1.ajouterVoisin(s3);
+        s1.ajouterVoisin(s4);
+
         s2.ajouterVoisin(s5);
 
-        s3.ajouterVoisin(s6);
+        s3.ajouterVoisin(s1);
+        s3.ajouterVoisin(s4);
+        s3.ajouterVoisin(s5);
 
-        s4.ajouterVoisin(s2);
-        s4.ajouterVoisin(s5);
-        s4.ajouterVoisin(s6);
+        s4.ajouterVoisin(s0);
+        s4.ajouterVoisin(s1);
+        s4.ajouterVoisin(s3);
 
-        s5.ajouterVoisin(s1);
+        s5.ajouterVoisin(s0);
         s5.ajouterVoisin(s2);
-        s5.ajouterVoisin(s4);
-
-        s6.ajouterVoisin(s1);
-        s6.ajouterVoisin(s3);
-        s6.ajouterVoisin(s4);
+        s5.ajouterVoisin(s3);
 
         //ajout des voisins preferes
-        s4.ajouterVoisinPref(s1);
-        s1.ajouterVoisinPref(s4);
+        s3.ajouterVoisinPref(s4);
+        s4.ajouterVoisinPref(s3);
 
         //initialisation de la matrice d'adjacence
         g.initMatrice(g.getSommets());
@@ -83,10 +83,10 @@ public class Main {
         coloriage.colorierGraphe();
 
 
-    }*/
+    }
 
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
 
         Graphe g = new Graphe();
 
@@ -131,5 +131,5 @@ public class Main {
 
         //et là on prie XD
         coloriage.colorierGraphe();
-    }
+    }*/
 }
