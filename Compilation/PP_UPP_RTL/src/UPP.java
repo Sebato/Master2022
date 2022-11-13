@@ -1,5 +1,9 @@
 package TP2;// UPP.java
 
+//  Binôme :
+//Luc Cahoreau
+//Sébastien Prud'homme Gateau
+
 import java.util.*;
 
 /**************************************/
